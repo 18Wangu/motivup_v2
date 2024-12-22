@@ -24,3 +24,7 @@ export default function Home() {
     </div>
   );
 }
+
+/*
+Quand je clique sur le bouton, toute la page bouge, a modifier
+ */
