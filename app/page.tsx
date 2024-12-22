@@ -7,6 +7,8 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col justify-center items-center">
       <h1 className="text-2xl mb-10">Crée ton profil</h1>
+      {/* Faire en sorte d'envoyer pseudo dans db pour venir l'afficher sur le profil de l'utilisateur
+          pour l'instant j'affiche ce qu'il y a devant @ du mail mais c'est pas top */}
       <input
         id="name"
         name="name"
