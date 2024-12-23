@@ -24,7 +24,7 @@ export default function AuthButtons({ buttonText = "INSCRIPTION AVEC GOOGLE" }) 
       <button
         onClick={handleSignIn}
         className="bg-[#58cc02] hover:bg-[#4baf01] text-white font-bold py-3 px-6 rounded-xl 
-        border-b-4 border-[#45a501] active:border-b-0 active:translate-y-[4px] transition-all w-72"
+        border-b-4 border-[#45a501] active:border-b-0 active:translate-y-[4px] transition-all w-72 h-14"
       >
         {buttonText}
       </button>
