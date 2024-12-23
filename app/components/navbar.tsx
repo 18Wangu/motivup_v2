@@ -11,14 +11,9 @@ export default function Navbar() {
     <div className="fixed bottom-0 flex justify-around w-full py-3 border-t-2 border-[#37464f] bg-[#131f24]">
       <Link 
         href="/pages/defis"
-        className={pathname === "/pages/defis" ? "border-2 border-[#3f85a7] bg-[#202f36] rounded-xl p-1" : "border-2 border-[#131f24] rounded-xl p-1"}
+        className={pathname === "/pages/defis" ? "border-2 border-[#3f85a7] bg-[#202f36] rounded-xl p-1 text-2xl" : "border-2 border-[#131f24] rounded-xl p-1 text-2xl"}
       >
-        <Image
-          src="https://d35aaqx5ub95lt.cloudfront.net/vendor/784035717e2ff1d448c0f6cc4efc89fb.svg"
-          alt="Defis"
-          width={30}
-          height={30}
-        />
+        🎯
       </Link>
       <Link
         href="/pages/recompenses"
