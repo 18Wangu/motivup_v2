@@ -16,6 +16,7 @@ model User {
 
   accounts      Account[]
   sessions      Session[]
+  challenges    Challenge[]
 }
 
 model Account {
@@ -52,4 +53,15 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Challenge {
+  id        String   @id @default(cuid())
+  name      String
+  emoji     String
+  frequency Int
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

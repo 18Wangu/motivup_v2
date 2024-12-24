@@ -1,3 +1,4 @@
+// api/auth/[...nextauth]/route.ts 
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth from "next-auth";
 import { prisma } from "@/lib/prisma";
@@ -14,6 +15,20 @@ export const authOptions = {
     ],
     session: {
         strategy: "jwt" as const,
+    },
+    callbacks: {
+        session: async ({ session, token }) => {
+          if (session?.user) {
+            session.user.id = token.sub;
+          }
+          return session;
+        },
+        jwt: async ({ user, token }) => {
+          if (user) {
+            token.uid = user.id;
+          }
+          return token;
+        },
     },
 };
     
