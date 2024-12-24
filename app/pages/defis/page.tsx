@@ -1,3 +1,4 @@
+// pages/defis/page.tsx
 "use client";
 
 import Navbar from '@/app/components/navbar';
