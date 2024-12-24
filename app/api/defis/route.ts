@@ -18,6 +18,34 @@ export async function GET() {
   }
 }
 
+// Récupérer l'XP total de tous les défis d'un utilisateur
+export async function POST(req: Request) {
+  const { userId } = await req.json(); // On suppose que l'utilisateur passe son ID
+
+  try {
+    // Récupérer les défis associés à cet utilisateur, avec leur XP
+    const userChallenges = await prisma.challenge.findMany({
+      where: {
+        userId, // Filtrer par userId
+      },
+    });
+
+    // Additionner l'XP de tous les défis
+    const totalXp = userChallenges.reduce((total, challenge) => {
+      return total + challenge.xp; // Accumule l'XP de chaque défi
+    }, 0);
+
+    return NextResponse.json({ totalXp });
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Erreur lors de la récupération de l\'XP' },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 // Mettre à jour un défi (ex : l'XP)
 export async function PATCH(req: Request) {
   const { id, xp } = await req.json();
