@@ -21,22 +21,29 @@ type LevelInfo = {
   progress: number; // Valeur entre 0 et 1
 };
 
-// Calcul du niveau en fonction de l'XP
+
+
 const calculateLevel = (xp: number): LevelInfo => {
   const levels = [150, 400, 700, 1050];
   let currentLevel = 1;
   let xpForNextLevel = levels[0];
+
   for (let i = 0; i < levels.length; i++) {
     if (xp < levels[i]) {
       xpForNextLevel = levels[i];
       break;
     }
-    currentLevel = i + 1;
+    currentLevel = i + 2; // Ajouter 2 car `i` commence à 0 et les niveaux à 1
   }
+
   const previousLevelXp = currentLevel === 1 ? 0 : levels[currentLevel - 2];
   const progress = (xp - previousLevelXp) / (xpForNextLevel - previousLevelXp);
 
-  return { currentLevel, xpForNextLevel, progress };
+  return {
+    currentLevel,
+    xpForNextLevel,
+    progress: Math.min(1, Math.max(0, progress)), // Assure que la progression est entre 0 et 1
+  };
 };
 
 // Fonction pour mettre à jour l'XP dans la base de données
@@ -76,7 +83,7 @@ export const DefiCard: React.FC<DefiCardProps> = ({ defi, onDelete }) => {
   // Décoche la case après 10 secondes
   useEffect(() => {
     if (isChecked) {
-      const timer = setTimeout(() => setIsChecked(false), 10000);
+      const timer = setTimeout(() => setIsChecked(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [isChecked]);
