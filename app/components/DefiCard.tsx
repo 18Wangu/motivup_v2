@@ -147,7 +147,9 @@ export const DefiCard: React.FC<DefiCardProps> = ({ defi, onDelete }) => {
           />
           <label
             htmlFor={`checkbox-${defi.id}`}
-            className="w-6 h-6 border-2 border-[#313f47] bg-[#131f24] rounded-lg flex items-center justify-center cursor-pointer"
+            className={`w-6 h-6 border-2 rounded-lg flex items-center justify-center cursor-pointer ${
+              isChecked ? 'border-[#58cc02]' : 'border-[#313f47]'
+            } bg-[#131f24]`}
           >
             {isChecked && <div className="text-xl text-[#58cc02]">🗸</div>}
           </label>

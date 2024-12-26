@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const TopBar: React.FC = () => {
     return (
-        <div className='flex py-4 w-full items-center justify-around'>
+        <div className='flex w-full items-center justify-around fixed top-0 p-4 bg-[#131f24] z-50 border-b-2 border-[#37464f]'>
             <div className='flex'>
                 <Image
                     src="https://d35aaqx5ub95lt.cloudfront.net/images/icons/398e4298a3b39ce566050e5c041949ef.svg"

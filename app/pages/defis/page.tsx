@@ -6,26 +6,35 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DefiCard } from '@/app/components/DefiCard';
 import { Calendar } from '@/app/components/Calendar';
+import { useSession } from 'next-auth/react';
+import TopBar from '@/app/components/topbar';
 
 type Defi = {
+  userId: number;
   id: number;
   name: string;
   emoji: string;
   frequency: number;
+  xp: number;
 };
 
 export default function Defis() {
+  const { data: session } = useSession();
   const [defis, setDefis] = useState<Defi[]>([]);
 
   useEffect(() => {
     const fetchDefis = async () => {
       try {
-        const response = await fetch('/api/defis');
+        const response = await fetch('/api/defis'); // Récupère tous les défis
         if (!response.ok) {
           throw new Error('Erreur lors de la récupération des défis');
         }
         const data = await response.json();
-        setDefis(data);
+
+        const userId = session?.user?.id;
+        const filteredDefis = data.filter((defi: Defi) => defi.userId === userId);
+
+        setDefis(filteredDefis); // Définit uniquement les défis de l'utilisateur
       } catch (error) {
         console.error('Erreur:', error);
       }
@@ -57,8 +66,9 @@ export default function Defis() {
   };
 
   return (
-    <div className='flex flex-col items-center justify-center my-8'>
-      <h1 className="text-2xl my-5">Mes Défis</h1>
+    <div className='flex flex-col items-center justify-center my-10'>
+      <TopBar />
+      <h1 className="text-2xl my-7">Mes Défis</h1>
 
       {/* Calendrier */}
       <Calendar />
