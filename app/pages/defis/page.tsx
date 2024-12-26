@@ -66,7 +66,7 @@ export default function Defis() {
   };
 
   return (
-    <div className='flex flex-col items-center justify-center my-10'>
+    <div className='flex flex-col items-center justify-center my-10 mx-10'>
       <TopBar />
       <h1 className="text-2xl my-7">Mes Défis</h1>
 

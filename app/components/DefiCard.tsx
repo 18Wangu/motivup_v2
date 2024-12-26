@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { Checkbox } from './Checkbox';
+import { ProgressBar } from './ProgressBar';
+import DeleteConfirmationPopup from './DeleteConfirmationPopup';
+import { useLevel } from './useLevel';
 
-// Types
 type Defi = {
   id: number;
   name: string;
   emoji: string;
   frequency: number;
-  xp: number; // Ajout de l'XP dans le type
+  xp: number;
 };
 
 type DefiCardProps = {
@@ -15,38 +17,6 @@ type DefiCardProps = {
   onDelete: (id: number) => void;
 };
 
-type LevelInfo = {
-  currentLevel: number;
-  xpForNextLevel: number;
-  progress: number; // Valeur entre 0 et 1
-};
-
-
-
-const calculateLevel = (xp: number): LevelInfo => {
-  const levels = [150, 400, 700, 1050];
-  let currentLevel = 1;
-  let xpForNextLevel = levels[0];
-
-  for (let i = 0; i < levels.length; i++) {
-    if (xp < levels[i]) {
-      xpForNextLevel = levels[i];
-      break;
-    }
-    currentLevel = i + 2; // Ajouter 2 car `i` commence à 0 et les niveaux à 1
-  }
-
-  const previousLevelXp = currentLevel === 1 ? 0 : levels[currentLevel - 2];
-  const progress = (xp - previousLevelXp) / (xpForNextLevel - previousLevelXp);
-
-  return {
-    currentLevel,
-    xpForNextLevel,
-    progress: Math.min(1, Math.max(0, progress)), // Assure que la progression est entre 0 et 1
-  };
-};
-
-// Fonction pour mettre à jour l'XP dans la base de données
 const updateXpInDb = async (id: number, newXp: number) => {
   try {
     await fetch('/api/defis', {
@@ -59,46 +29,56 @@ const updateXpInDb = async (id: number, newXp: number) => {
   }
 };
 
-// Composant principal
 export const DefiCard: React.FC<DefiCardProps> = ({ defi, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [xp, setXp] = useState(defi.xp);
+  const [checkCount, setCheckCount] = useState(0);
+  const [flamme, setFlamme] = useState(0);
+  const [coeur, setCoeur] = useState(3);
+  const [coffre, setCoffre] = useState(0);
 
-  const { currentLevel, xpForNextLevel, progress } = calculateLevel(xp);
+  const { currentLevel, xpForNextLevel, progress } = useLevel(xp);
 
-  // Gestion de la case à cocher
   const handleCheckboxChange = () => {
     const newChecked = !isChecked;
     setIsChecked(newChecked);
+    setCheckCount((prev) => (newChecked ? prev + 1 : prev));
     const xpChange = newChecked ? 25 : -25;
-    setXp((prevXp) => Math.max(0, prevXp + xpChange)); // Évite les valeurs négatives
+    setXp((prevXp) => Math.max(0, prevXp + xpChange));
   };
 
-  // Synchroniser l'XP avec la base de données
   useEffect(() => {
     updateXpInDb(defi.id, xp);
   }, [xp]);
 
-  // Décoche la case après 5 secondes (simuler un jour)
   useEffect(() => {
     if (isChecked) {
-      const timer = setTimeout(() => setIsChecked(false), 5000);
+      const timer = setTimeout(() => setIsChecked(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [isChecked]);
 
-  // Ouvrir la popup (uniquement sur la carte de défi)
-  const openModal = (event: React.MouseEvent) => {
-    setIsModalOpen(true);
-  };
+  useEffect(() => {
+    const weekTimer = setTimeout(() => {
+      if (checkCount >= defi.frequency) {
+        setCoffre((prev) => prev + 1);
+        setFlamme((prev) => Math.max(1, prev + 1));
+      } else {
+        setCoeur((prev) => {
+          if (prev > 0) return prev - 1;
+          setFlamme(0);
+          return 0;
+        });
+      }
+      setCheckCount(0);
+    }, 14000);
 
-  // Fermer la popup
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+    return () => clearTimeout(weekTimer);
+  }, [checkCount, defi.frequency, coffre, flamme, coeur]);
 
-  // Supprimer le défi
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   const handleDelete = () => {
     onDelete(defi.id);
     closeModal();
@@ -107,77 +87,21 @@ export const DefiCard: React.FC<DefiCardProps> = ({ defi, onDelete }) => {
   return (
     <div>
       <div className="flex items-center gap-3 p-3 border-2 rounded-xl border-[#313f47] relative cursor-pointer">
-        {/* Émoji et popup d'ouverture */}
-        <div onClick={openModal} className="text-6xl">
-          {defi.emoji}
-        </div>
-
-        {/* Contenu de la carte */}
+        <div onClick={openModal} className="text-6xl">{defi.emoji}</div>
         <div className="flex flex-col">
           <h1 className="text-base text-[#313f47]">Niveau {currentLevel}</h1>
-          <h2 className="mb-3">{defi.name} <span className='text-xs text-[#ffd900]'>{defi.frequency} fois/semaine</span></h2>
-          <div className="bg-[#313f47] rounded-xl w-52 h-3 z-0 flex items-center justify-between">
-            <div
-              className="bg-[#ffd900] rounded-xl h-3 z-10"
-              style={{ width: `${progress * 100}%` }}
-            ></div>
-            <div className="flex items-center">
-              <h1 className="text-[#ffd900] mr-1 text-xs">
-                {xp} / {xpForNextLevel}
-              </h1>
-              <Image
-                src="https://d35aaqx5ub95lt.cloudfront.net/images/goals/2b5a211d830a24fab92e291d50f65d1d.svg"
-                alt="Xp"
-                width={15}
-                height={15}
-                className="mr-1"
-              />
-            </div>
-          </div>
+          <h2>{defi.name}</h2>
+          <span className='text-xs text-[#ffd900] mb-3'>{defi.frequency} fois/semaine</span>
+          <ProgressBar progress={progress} xp={xp} xpForNextLevel={xpForNextLevel} />
         </div>
-
-        {/* Case à cocher en haut à droite */}
-        <div className="absolute top-2 right-2">
-          <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={handleCheckboxChange}
-            id={`checkbox-${defi.id}`}
-            className="hidden"
-          />
-          <label
-            htmlFor={`checkbox-${defi.id}`}
-            className={`w-6 h-6 border-2 rounded-lg flex items-center justify-center cursor-pointer ${
-              isChecked ? 'border-[#58cc02]' : 'border-[#313f47]'
-            } bg-[#131f24]`}
-          >
-            {isChecked && <div className="text-xl text-[#58cc02]">🗸</div>}
-          </label>
-        </div>
+        <Checkbox isChecked={isChecked} onChange={handleCheckboxChange} id={`checkbox-${defi.id}`} />
       </div>
 
-      {/* Popup de confirmation de suppression */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-[#313f47] p-6 rounded-lg w-80">
-            <h2 className="text-lg mb-4">Voulez-vous vraiment supprimer ce défi ?</h2>
-            <div className="flex justify-between">
-              <button
-                onClick={closeModal}
-                className="bg-gray-300 text-black py-2 px-4 rounded-md hover:bg-gray-400"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleDelete}
-                className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
-              >
-                Supprimer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationPopup
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };
