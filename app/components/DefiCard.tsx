@@ -80,7 +80,7 @@ export const DefiCard: React.FC<DefiCardProps> = ({ defi, onDelete }) => {
     updateXpInDb(defi.id, xp);
   }, [xp]);
 
-  // Décoche la case après 10 secondes
+  // Décoche la case après 2 secondes
   useEffect(() => {
     if (isChecked) {
       const timer = setTimeout(() => setIsChecked(false), 2000);
