@@ -80,10 +80,10 @@ export const DefiCard: React.FC<DefiCardProps> = ({ defi, onDelete }) => {
     updateXpInDb(defi.id, xp);
   }, [xp]);
 
-  // Décoche la case après 2 secondes
+  // Décoche la case après 5 secondes (simuler un jour)
   useEffect(() => {
     if (isChecked) {
-      const timer = setTimeout(() => setIsChecked(false), 2000);
+      const timer = setTimeout(() => setIsChecked(false), 5000);
       return () => clearTimeout(timer);
     }
   }, [isChecked]);
@@ -115,7 +115,7 @@ export const DefiCard: React.FC<DefiCardProps> = ({ defi, onDelete }) => {
         {/* Contenu de la carte */}
         <div className="flex flex-col">
           <h1 className="text-base text-[#313f47]">Niveau {currentLevel}</h1>
-          <h2 className="mb-3">{defi.name}</h2>
+          <h2 className="mb-3">{defi.name} <span className='text-xs text-[#ffd900]'>{defi.frequency} fois/semaine</span></h2>
           <div className="bg-[#313f47] rounded-xl w-52 h-3 z-0 flex items-center justify-between">
             <div
               className="bg-[#ffd900] rounded-xl h-3 z-10"
